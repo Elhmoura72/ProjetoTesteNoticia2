@@ -1,0 +1,102 @@
+﻿@using X.PagedList;
+@using X.PagedList.Mvc.Core;
+@model IPagedList<ProjetoNoticias.Models.TbNoticias>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Lista de Notícias</h2>
+
+<p>
+    <a asp-action="Create">Nova Notícia</a>
+</p>
+<hr class="m-3" />
+<form asp-action="Busca">
+    <div class="form-group row ml-lg-auto">
+        <label for="Busca" class="col-sm-1 col-form-label text-right font-weight-bold">Pesquisa</label>
+        <div class="col-sm-2">
+            @Html.DropDownList("Busca", new List<SelectListItem>
+                { new SelectListItem {Selected = true,Text = "AUTOR", Value = "1"},
+                new SelectListItem {Text = "CATEGORIA", Value = "2"}}, new { @class = "form-control", @id = "Busca", @onchange = "ClkBusca(this.value)" })
+        </div>
+        <div class="col-sm-5">
+            @Html.DropDownList("BuscaAutor", (SelectList)ViewBag.Autores, new { @class = "form-control", @id = "BuscaAutor" })
+            @Html.DropDownList("BuscaCategoria", (SelectList)ViewBag.Categorias, new { @class = "form-control", @id = "BuscaCategoria", @style = "display:none" })
+
+        </div>
+
+        <div class="col-sm-2">
+            <input type="submit" class="btn btn-primary mb-auto" />
+        </div>
+    </div>
+</form>
+
+
+<hr class="m-3" />
+
+<div class="container">
+    @foreach (var item in Model)
+    {
+        <p class="font-weight-bold text-left m-3">Data da Publicação: @Convert.ToDateTime(item.Data).ToString("dd-MM-yyyy")</p>
+        <h2 class="text-center m-4"> @Html.DisplayFor(modelItem => item.Titulo)  </h2>
+        @Html.TextAreaFor(modelItem => item.Descricao, new { @class = " d-flex justify-content-center form-control text-justify m-3", @rows = "10", @readonly = "readonly" })
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Autor
+                    </th>
+                    <th>
+                        Categoria
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Autor.Nome)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Categoria.Nome)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id" asp-route-pagina="@ViewBag.Pagina">Editar</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id" asp-route-pagina="@ViewBag.Pagina">Detalhe</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    }
+
+    <hr class="m-3" />
+
+</div>
+
+<div class="row d-flex justify-content-center p-2">
+    @Html.PagedListPager(Model, pagina => Url.Action("Index", new { pagina }), new PagedListRenderOptions { FunctionToTransformEachPageLink = (liTag, aTag) => { aTag.Attributes.Add("class", "page-link".ToString()); return aTag; }, LiElementClasses = new[] { "page-item" }, UlElementClasses = new[] { "pagination  justify-content-center" } })
+
+</div>
+
+<script>
+    function ClkBusca(val) {
+        switch (val) {
+            case "1":
+                document.getElementById("BuscaCategoria").style.display = "none";
+                document.getElementById("BuscaAutor").style.display = "block";
+                break;
+            case "2":
+                document.getElementById("BuscaCategoria").style.display = "block";
+                document.getElementById("BuscaAutor").style.display = "none";
+                break;
+             case "3":
+                document.getElementById("BuscaCategoria").style.display = "none";
+                document.getElementById("BuscaAutor").style.display = "none";
+                break;
+
+        }
+    }
+</script>
+
